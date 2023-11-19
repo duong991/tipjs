@@ -1,5 +1,4 @@
 import { Request } from 'express';
-import { User } from '@interfaces/users.interface';
 
 export interface DataStoredInToken {
   _id: string;
@@ -11,5 +10,20 @@ export interface TokenData {
 }
 
 export interface RequestWithUser extends Request {
-  user: User;
+  user: any;
+}
+
+export interface RequestWithApiKey extends Request {
+  apiKey: any;
+}
+
+export interface ISignUpData {
+  email: string;
+  name: string;
+  password: string;
+}
+
+export interface ILoginData {
+  email: string;
+  password: string;
 }

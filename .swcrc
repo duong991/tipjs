@@ -22,10 +22,10 @@
     "paths": {
       "@/*": ["*"],
       "@config": ["config"],
+      "@helpers/*": ["helpers/*"],
       "@controllers/*": ["controllers/*"],
       "@database": ["database"],
       "@dtos/*": ["dtos/*"],
-      "@exceptions/*": ["exceptions/*"],
       "@interfaces/*": ["interfaces/*"],
       "@middlewares/*": ["middlewares/*"],
       "@models/*": ["models/*"],
