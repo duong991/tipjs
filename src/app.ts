@@ -13,8 +13,8 @@ import { dbConnection } from '@database';
 import { Routes } from '@interfaces/routes.interface';
 import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
-import { log } from 'console';
-
+import { apiKeyMiddleware, permissionsMiddleware } from './auth/checkAuth';
+import { RoleShop } from './constants';
 export class App {
   public app: express.Application;
   public env: string;
@@ -59,11 +59,13 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
+    this.app.use(apiKeyMiddleware);
+    this.app.use(permissionsMiddleware(RoleShop.SHOP));
   }
 
   private initializeRoutes(routes: Routes[]) {
     routes.forEach(route => {
-      this.app.use('/', route.router);
+      this.app.use('/api/v1', route.router);
     });
   }
 

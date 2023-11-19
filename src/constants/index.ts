@@ -1,8 +1,7 @@
 const RoleShop = {
-  WRITER: '001',
-  EDITED: '002',
-  ADMIN: '003',
-  SHOP: '004',
+  WRITER: '0000',
+  SHOP: '1111',
+  ADMIN: '2222',
 };
 
 const HEADER = {
