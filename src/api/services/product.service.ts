@@ -39,27 +39,33 @@ class Product {
   }
 
   // create a new product
-  async createProduct() {
-    return await ProductModel.create(this);
+  async createProduct(product_id) {
+    return await ProductModel.create({ ...this, _id: product_id });
   }
 }
 
 class Clothing extends Product {
   async createProduct() {
-    const newClothing = await ClothingModel.create(this.product_attributes);
+    const newClothing = await ClothingModel.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
     if (!newClothing) throw new HttpException(400, 'Create clothing failed');
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newClothing._id);
     if (!newProduct) throw new HttpException(400, 'Create product failed');
     return newProduct;
   }
 }
 class Electronic extends Product {
   async createProduct() {
-    const newElectronic = await ElectronicModel.create(this.product_attributes);
+    const newElectronic = await ElectronicModel.create({
+      ...this.product_attributes,
+      product_shop: this.product_shop,
+    });
     if (!newElectronic) throw new HttpException(400, 'Create electronic failed');
 
-    const newProduct = await super.createProduct();
+    const newProduct = await super.createProduct(newElectronic._id);
     if (!newProduct) throw new HttpException(400, 'Create product failed');
     return newProduct;
   }

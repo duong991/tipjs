@@ -1,4 +1,4 @@
-import { model, Schema, Document } from 'mongoose';
+import { model, Schema, Document, Types } from 'mongoose';
 import { Key } from '@/interfaces/key.interface';
 import { IProduct } from '@/interfaces/product.interface';
 
@@ -43,6 +43,7 @@ const ProductSchema: Schema = new Schema(
 
 const ClothingSchema: Schema = new Schema(
   {
+    product_shop: { type: Types.ObjectId, required: true, ref: 'Shop' },
     brand: { type: String, required: true },
     size: { type: String, required: true },
     material: { type: String, required: true },
@@ -55,6 +56,7 @@ const ClothingSchema: Schema = new Schema(
 
 const ElectronicSchema: Schema = new Schema(
   {
+    product_shop: { type: Types.ObjectId, required: true, ref: 'Shop' },
     brand: { type: String, required: true },
     model: { type: String, required: true },
     color: { type: String, required: true },
