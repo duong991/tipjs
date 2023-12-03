@@ -1,8 +1,13 @@
 import { Request } from 'express';
 
-export interface DataStoredInToken {
+export interface DataStoredInAccessToken {
   userId: string;
   role: string[];
+}
+
+export interface DataStoredInRefreshToken {
+  userId: string;
+  email: string;
 }
 
 export interface TokenData {
@@ -13,6 +18,11 @@ export interface TokenData {
 export interface RequestWithUser extends Request {
   userId: string;
   role: string[];
+}
+
+export interface RequestWithRefreshToken extends Request {
+  userId: string;
+  email: string;
 }
 
 export interface RequestWithApiKey extends Request {

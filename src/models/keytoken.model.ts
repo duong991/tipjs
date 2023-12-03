@@ -13,7 +13,8 @@ const keyTokenSchema: Schema = new Schema(
       ref: 'Shop',
     },
     publicKey: { type: String, required: true },
-    refreshToken: { type: Array, default: [] },
+    refreshToken: { type: String },
+    refreshTokenUsed: { type: Array, default: [] },
   },
   {
     timestamps: true,
