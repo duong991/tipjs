@@ -1,22 +1,26 @@
-import handleException from '@/helpers/exceptions/tryCatch.helper';
+import { HttpException } from '@/helpers/exceptions/HttpException';
 import { sign, verify } from 'jsonwebtoken';
 
 const createTokenPair = async (payload: any, publicKey: any, privateKey: any): Promise<{ accessToken: string; refreshToken: string }> => {
+  const accessToken = sign(payload, privateKey, {
+    algorithm: 'RS256',
+    expiresIn: '30m',
+  });
+
+  const refreshToken = sign(payload, privateKey, {
+    algorithm: 'RS256',
+    expiresIn: '30d',
+  });
+
+  return { accessToken, refreshToken };
+};
+
+const verifyToken = async (token: string, publicKey: any): Promise<any> => {
   try {
-    const accessToken = sign(payload, privateKey, {
-      algorithm: 'RS256',
-      expiresIn: '30m',
-    });
-
-    const refreshToken = sign(payload, privateKey, {
-      algorithm: 'RS256',
-      expiresIn: '30d',
-    });
-
-    return { accessToken, refreshToken };
+    return verify(token, publicKey);
   } catch (error) {
-    handleException(error);
+    throw new HttpException(401, 'Unauthorized');
   }
 };
 
-export { createTokenPair };
+export { createTokenPair, verifyToken };

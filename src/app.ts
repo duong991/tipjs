@@ -15,6 +15,10 @@ import { ErrorMiddleware } from '@middlewares/error.middleware';
 import { logger, stream } from '@utils/logger';
 import { apiKeyMiddleware, permissionsMiddleware } from './auth/checkAuth';
 import { RoleShop } from './constants';
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+
 export class App {
   public app: express.Application;
   public env: string;
@@ -33,7 +37,12 @@ export class App {
   }
 
   public listen() {
-    this.app.listen(this.port, () => {
+    const sslOptions = {
+      key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+      cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem')),
+    };
+
+    https.createServer(sslOptions, this.app).listen(this.port, () => {
       logger.info(`=================================`);
       logger.info(`======= ENV: ${this.env} =======`);
       logger.info(`🚀 App listening on the port ${this.port}`);
@@ -46,8 +55,12 @@ export class App {
   }
 
   private async connectToDatabase() {
-    await dbConnection();
-    logger.info('🟢 The database is connected.');
+    try {
+      await dbConnection();
+      logger.info('🟢 The database is connected.');
+    } catch (error) {
+      logger.error(`🔴 Unable to connect to the database: ${error}.`);
+    }
   }
 
   private initializeMiddlewares() {
@@ -59,8 +72,8 @@ export class App {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(cookieParser());
-    this.app.use(apiKeyMiddleware);
-    this.app.use(permissionsMiddleware(RoleShop.SHOP));
+    // this.app.use(apiKeyMiddleware);
+    // this.app.use(permissionsMiddleware(RoleShop.SHOP));
   }
 
   private initializeRoutes(routes: Routes[]) {

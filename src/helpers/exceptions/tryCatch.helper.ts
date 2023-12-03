@@ -1,15 +1,19 @@
 import { log } from 'console';
 import { HttpException } from './HttpException';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { logger } from '@/utils/logger';
 import { RequestWithApiKey } from '@/interfaces/auth.interface';
 
-const handleException = (error: any) => {
-  log(error);
-  if (error instanceof HttpException) {
-    throw error;
-  } else {
-    throw new HttpException(500, error.message);
+const handleException = (error: any, next: NextFunction) => {
+  try {
+    log(error);
+    if (error instanceof HttpException) {
+      throw error;
+    } else {
+      throw new HttpException(500, error.message);
+    }
+  } catch (error) {
+    next(error);
   }
 };
 

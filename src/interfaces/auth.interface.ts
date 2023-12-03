@@ -1,7 +1,8 @@
 import { Request } from 'express';
 
 export interface DataStoredInToken {
-  _id: string;
+  userId: string;
+  role: string[];
 }
 
 export interface TokenData {
@@ -10,7 +11,8 @@ export interface TokenData {
 }
 
 export interface RequestWithUser extends Request {
-  user: any;
+  userId: string;
+  role: string[];
 }
 
 export interface RequestWithApiKey extends Request {
@@ -26,4 +28,5 @@ export interface ISignUpData {
 export interface ILoginData {
   email: string;
   password: string;
+  refreshToken?: string;
 }

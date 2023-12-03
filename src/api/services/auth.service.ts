@@ -1,18 +1,22 @@
-import { ILoginData, ISignUpData } from '@/interfaces/auth.interface';
+import { DataStoredInToken, ILoginData, ISignUpData } from '@/interfaces/auth.interface';
 import { hash, compare } from 'bcrypt';
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
 import { ShopModel } from '@/models/shop.model';
 import { HttpException } from '@/helpers/exceptions/HttpException';
 import handleException from '@/helpers/exceptions/tryCatch.helper';
-import crypto from 'crypto';
-import { KeyTokenService } from './keyToken.service';
 import { RoleShop } from '@/constants';
-import { createTokenPair } from '@/auth/authUtils';
 import { Shop } from '@/interfaces/shop.interface';
+
+/*UTILS*/
+import generateTokens from '@/utils/generateTokens';
+/*SERVICE*/
+import { findByEmail } from './shop.service';
+import getDataInfo from '@/utils/getInfoData';
+import { KeyTokenModel } from '@/models/keytoken.model';
+import { KeyTokenService } from './keyToken.service';
+
 @Service()
 export class AuthService {
-  public keyStore = Container.get(KeyTokenService);
-
   public async signup(data: ISignUpData): Promise<{
     tokens: {
       accessToken: string;
@@ -20,55 +24,31 @@ export class AuthService {
     };
     shopInfo: Shop;
   }> {
-    try {
-      const { email, password, name } = data;
+    const { email, password, name } = data;
+    const holderShop = await findByEmail({ email });
+    if (holderShop) {
+      throw new HttpException(409, `This email ${email} already exists`);
+    }
+    const passwordHash = await hash(password, 10);
 
-      const holderShop = await ShopModel.find({
-        email,
-      }).lean();
-      if (holderShop.length > 0) {
-        throw new HttpException(409, `This email ${email} already exists`);
-      }
-      const passwordHash = await hash(password, 10);
+    const newShop = await ShopModel.create({
+      email,
+      password: passwordHash,
+      name,
+      role: [RoleShop.SHOP],
+    });
+    if (newShop) {
+      const payload: DataStoredInToken = {
+        userId: newShop._id,
+        role: newShop.role,
+      };
 
-      const newShop = await ShopModel.create({
-        email,
-        password: passwordHash,
-        name,
-        role: [RoleShop.SHOP],
-      });
-      if (newShop) {
-        const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-          modulusLength: 4096,
-          publicKeyEncoding: {
-            type: 'pkcs1',
-            format: 'pem',
-          },
-          privateKeyEncoding: {
-            type: 'pkcs1',
-            format: 'pem',
-          },
-        });
+      const tokens = await generateTokens(payload, true);
 
-        //TODO: create key token in schema "KeyStore"
-        const publicKeyString = await this.keyStore.createKeyToken({
-          userId: newShop._id,
-          publicKey,
-        });
-
-        if (!publicKeyString) throw new HttpException(409, `Error create key token`);
-        const payload = {
-          userId: newShop._id,
-          role: newShop.role,
-        };
-        const tokens = await createTokenPair(payload, publicKeyString, privateKey);
-        return {
-          tokens,
-          shopInfo: newShop,
-        };
-      }
-    } catch (error) {
-      handleException(error);
+      return {
+        tokens,
+        shopInfo: newShop,
+      };
     }
   }
 
@@ -79,52 +59,35 @@ export class AuthService {
     };
     shopInfo: Shop;
   }> {
-    try {
-      const { email, password } = data;
+    const { email, password, refreshToken } = data;
 
-      const shop = await ShopModel.findOne({
-        email,
-      }).lean();
-      if (!shop) {
-        throw new HttpException(409, `This email ${email} not exists`);
-      }
-      const isPasswordMatching = await compare(password, shop.password);
-      if (!isPasswordMatching) {
-        throw new HttpException(409, `This password ${password} not matching`);
-      }
-      const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-          type: 'pkcs1',
-          format: 'pem',
-        },
-        privateKeyEncoding: {
-          type: 'pkcs1',
-          format: 'pem',
-        },
-      });
-
-      // update keyStore Schema
-      const publicKeyString = await this.keyStore.updateKeyToken({
-        userId: shop._id,
-        publicKey,
-      });
-
-      if (!publicKeyString) throw new HttpException(409, `Error update key token`);
-
-      const payload = {
-        userId: shop._id,
-        role: shop.role,
-      };
-
-      const tokens = await createTokenPair(payload, publicKeyString, privateKey);
-
-      return {
-        tokens,
-        shopInfo: shop,
-      };
-    } catch (error) {
-      handleException(error);
+    const shop = await findByEmail({ email });
+    if (!shop) {
+      throw new HttpException(409, `This email ${email} not exists`);
     }
+    const isPasswordMatching = await compare(password, shop.password);
+    if (!isPasswordMatching) {
+      throw new HttpException(409, `This password ${password} not matching`);
+    }
+
+    const payload: DataStoredInToken = {
+      userId: shop._id,
+      role: shop.role,
+    };
+
+    const tokens = await generateTokens(payload, false);
+
+    return {
+      tokens,
+      shopInfo: getDataInfo({
+        fields: ['_id', 'name', 'email', 'status', 'verified', 'role'],
+        object: shop,
+      }),
+    };
+  }
+
+  public async logout(userId: string): Promise<any> {
+    const delKey = await KeyTokenService.removeKeyById(userId);
+    return delKey;
   }
 }

@@ -1,38 +1,48 @@
-// import { NextFunction, Response } from 'express';
-// import { verify } from 'jsonwebtoken';
-// import { SECRET_KEY } from '@config';
-// import { HttpException } from '@/helpers/exceptions/HttpException';
-// import { DataStoredInToken, RequestWithUser } from '@interfaces/auth.interface';
-// import { UserModel } from '@/models/shop.model';
+import { NextFunction, Response } from 'express';
+import { RequestWithUser } from '@/interfaces/auth.interface';
+import { HEADER } from '@/constants';
+import { HttpException } from '@/helpers/exceptions/HttpException';
+import { KeyTokenService } from '@/api/services/keyToken.service';
+import { verifyToken } from '@/auth/authUtils';
+import { NotFoundError, Unauthorized } from '@/helpers/valid_responses/error.response';
+import { verify } from 'jsonwebtoken';
+const getAuthorization = req => {
+  const coockie = req.cookies['Authorization'];
+  if (coockie) return coockie;
 
-// const getAuthorization = req => {
-//   const coockie = req.cookies['Authorization'];
-//   if (coockie) return coockie;
+  const header = req.header('Authorization');
+  if (header) return header.split('Bearer ')[1];
 
-//   const header = req.header('Authorization');
-//   if (header) return header.split('Bearer ')[1];
+  return null;
+};
 
-//   return null;
-// };
+export const AuthMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.headers[HEADER.CLIENT_ID] as string;
 
-// export const AuthMiddleware = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-//   try {
-//     const Authorization = getAuthorization(req); // -> token
+    if (!userId) {
+      throw new HttpException(403, 'Forbidden');
+    }
 
-//     if (Authorization) {
-//       const { _id } = (await verify(Authorization, SECRET_KEY)) as DataStoredInToken;
-//       const findUser = await UserModel.findById(_id);
+    const { publicKey } = await KeyTokenService.findPublicKeyByUserId(userId);
+    if (!publicKey) {
+      throw new NotFoundError({ message: 'Not found keystore' });
+    }
+    const accessToken = getAuthorization(req);
+    if (!accessToken) {
+      throw new Unauthorized({ message: 'Invalid Request' });
+    }
 
-//       if (findUser) {
-//         req.user = findUser;
-//         next();
-//       } else {
-//         next(new HttpException(401, 'Wrong authentication token'));
-//       }
-//     } else {
-//       next(new HttpException(404, 'Authentication token missing'));
-//     }
-//   } catch (error) {
-//     next(new HttpException(401, 'Wrong authentication token'));
-//   }
-// };
+    const decodeUser = verify(accessToken, publicKey) as RequestWithUser;
+    console.log(decodeUser);
+    if (userId !== decodeUser.userId) {
+      throw new Unauthorized({ message: 'Invalid User' });
+    }
+    req.userId = userId.toString();
+    req.role = decodeUser.role;
+    next();
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};

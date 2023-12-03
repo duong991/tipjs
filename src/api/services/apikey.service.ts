@@ -7,15 +7,11 @@ import { ApiKeyModel } from '@/models/apikey.model';
 
 export class ApiKeyService {
   static async findById(key: string): Promise<any> {
-    try {
-      const objKey = await ApiKeyModel.findOne({
-        key,
-        status: true,
-      }).lean();
+    const objKey = await ApiKeyModel.findOne({
+      key,
+      status: true,
+    }).lean();
 
-      return objKey;
-    } catch (error) {
-      handleException(error);
-    }
+    return objKey;
   }
 }
