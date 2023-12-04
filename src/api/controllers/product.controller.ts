@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { ProductFactory } from '@/api/services/product.service';
+// import { ProductFactory } from '@/api/services/product.service';
+import { ProductFactory } from '../services/product.service.xxx';
 import { IProduct } from '@/interfaces/product.interface';
 import { Created } from '@/helpers/valid_responses/success.response';
 import { RequestWithUser } from '@/interfaces/auth.interface';
