@@ -20,6 +20,7 @@ export class ProductRoute implements Routes {
     this.router.post(`${this.path}`, asyncHandler(this.product.createProduct));
     this.router.put(`${this.path}/published/:product_id`, asyncHandler(this.product.publishProductByShop));
     this.router.put(`${this.path}/unPublished/:product_id`, asyncHandler(this.product.unPublishProductByShop));
+    this.router.patch(`${this.path}/:product_id`, asyncHandler(this.product.updateProduct));
     /*==================QUERY==================*/
     this.router.get(`${this.path}/drafts/all`, asyncHandler(this.product.getAllDraftProductsForShop));
     this.router.get(`${this.path}/published/all`, asyncHandler(this.product.getAllPublishProductsForShop));

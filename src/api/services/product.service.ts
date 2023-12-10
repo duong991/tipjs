@@ -9,8 +9,10 @@ import {
   searchProductByUser,
   unPublishedProductByShop,
   findProduct,
+  updateProductById,
 } from '@/models/repositories/product.repo';
 import { Types } from 'mongoose';
+import { removeUndefinedObject, updateNestedObject } from '@/utils';
 // define Factory class to create product
 class ProductFactory {
   static productRegistry = {};
@@ -27,6 +29,12 @@ class ProductFactory {
     const productClass = ProductFactory.productRegistry[type];
     if (!productClass) throw new HttpException(400, 'Type not supported');
     return await new productClass(payload).createProduct();
+  }
+
+  static async updateProduct(type, product_id, payload: IProduct): Promise<IProduct> {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass) throw new HttpException(400, 'Type not supported');
+    return await new productClass(payload).updateProduct(product_id);
   }
 
   static async findAllDraftProductsForShop({ products_shop, limit = 50, skip = 0 }): Promise<IProduct[]> {
@@ -86,9 +94,12 @@ class Product {
     this.product_attributes = product_attributes;
   }
 
-  // create a new product
   async createProduct(product_id) {
     return await ProductModel.create({ ...this, _id: product_id });
+  }
+
+  async updateProduct(product_id, payload) {
+    return await updateProductById({ product_id, payload, model: ProductModel });
   }
 }
 
@@ -104,6 +115,18 @@ class Clothing extends Product {
     if (!newProduct) throw new HttpException(400, 'Create product failed');
     return newProduct;
   }
+
+  async updateProduct(product_id) {
+    const objectParams = removeUndefinedObject({ ...this });
+    if (objectParams.product_attributes) {
+      const payload = updateNestedObject(objectParams.product_attributes);
+      await updateProductById({ product_id, payload, model: ClothingModel });
+    }
+
+    const updateProduct = await super.updateProduct(product_id, updateNestedObject(objectParams));
+    if (!updateProduct) throw new HttpException(400, 'Update product failed');
+    return updateProduct;
+  }
 }
 class Electronic extends Product {
   async createProduct() {
@@ -116,6 +139,18 @@ class Electronic extends Product {
     const newProduct = await super.createProduct(newElectronic._id);
     if (!newProduct) throw new HttpException(400, 'Create product failed');
     return newProduct;
+  }
+
+  async updateProduct(product_id) {
+    const objectParams = removeUndefinedObject({ ...this });
+    if (objectParams.product_attributes) {
+      const payload = updateNestedObject(objectParams.product_attributes);
+      await updateProductById({ product_id, payload, model: ElectronicModel });
+    }
+
+    const updateProduct = await super.updateProduct(product_id, updateNestedObject(objectParams));
+    if (!updateProduct) throw new HttpException(400, 'Update product failed');
+    return updateProduct;
   }
 }
 
@@ -130,6 +165,18 @@ class Furniture extends Product {
     const newProduct = await super.createProduct(newFurniture._id);
     if (!newProduct) throw new HttpException(400, 'Create product failed');
     return newProduct;
+  }
+
+  async updateProduct(product_id) {
+    const objectParams = removeUndefinedObject({ ...this });
+    if (objectParams.product_attributes) {
+      const payload = updateNestedObject(objectParams.product_attributes);
+      await updateProductById({ product_id, payload, model: FurnitureModel });
+    }
+
+    const updateProduct = await super.updateProduct(product_id, updateNestedObject(objectParams));
+    if (!updateProduct) throw new HttpException(400, 'Update product failed');
+    return updateProduct;
   }
 }
 

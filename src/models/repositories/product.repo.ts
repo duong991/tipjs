@@ -39,6 +39,9 @@ const unPublishedProductByShop = async ({ product_shop, product_id }) => {
   return await setPublishedStatusProductByShop({ product_shop, product_id, isPublished: false });
 };
 
+const updateProductById = async ({ product_id, payload, model, isNew = true }) => {
+  return await model.updateProductById(product_id, payload, { new: isNew });
+};
 /*==========================Search=================================*/
 
 const searchProductByUser = async ({ keySearch, limit = 50, skip = 0 }) => {
@@ -92,4 +95,5 @@ export {
   publicProductByShop,
   unPublishedProductByShop,
   searchProductByUser,
+  updateProductById,
 };

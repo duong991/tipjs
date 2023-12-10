@@ -101,4 +101,19 @@ export class ProductController {
       data: await ProductFactory.findProduct({ product_id }),
     }).send(res);
   };
+
+  /**
+   * @desc  Update product
+   * @param {String} product_id
+   * */
+  public updateProduct = async (req, res: Response) => {
+    const { product_id } = req.params;
+    const productData: IProduct = { ...req.body, product_shop: req.userId };
+    const productType = productData.product_type;
+    const result = await ProductFactory.updateProduct(productType, product_id, productData);
+    new OK({
+      message: 'Update product',
+      data: result,
+    }).send(res);
+  };
 }
