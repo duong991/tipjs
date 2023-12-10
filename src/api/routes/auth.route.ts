@@ -18,8 +18,7 @@ export class AuthRoute implements Routes {
     this.router.post(`${this.path}/signup`, asyncHandler(this.auth.signUp));
     this.router.post(`${this.path}/login`, asyncHandler(this.auth.login));
 
-    this.router.use(AuthMiddleware);
-    this.router.post(`${this.path}/logout`, asyncHandler(this.auth.logout));
-    this.router.post(`${this.path}/refresh-token`, asyncHandler(this.auth.refreshToken));
+    this.router.post(`${this.path}/logout`, AuthMiddleware, asyncHandler(this.auth.logout));
+    this.router.post(`${this.path}/refresh-token`, AuthMiddleware, asyncHandler(this.auth.refreshToken));
   }
 }
