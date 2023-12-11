@@ -11,4 +11,5 @@ export interface IProduct {
   product_ratingAvg: number;
   isDraft?: boolean;
   isPublished?: boolean;
+  product_quantity?: number;
 }

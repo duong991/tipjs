@@ -13,6 +13,7 @@ import {
 } from '@/models/repositories/product.repo';
 import { Types } from 'mongoose';
 import { removeUndefinedObject, updateNestedObject } from '@/utils';
+import { insertInventory } from '@/models/repositories/inventory.repo';
 // define Factory class to create product
 class ProductFactory {
   static productRegistry = {};
@@ -84,7 +85,18 @@ class Product {
   product_shop: string;
   product_attributes: any;
 
-  constructor({ product_name, product_thumb, product_description, product_price, product_type, product_shop, product_attributes }: IProduct) {
+  product_quantity: number;
+
+  constructor({
+    product_name,
+    product_thumb,
+    product_description,
+    product_price,
+    product_type,
+    product_shop,
+    product_attributes,
+    product_quantity,
+  }: IProduct) {
     this.product_name = product_name;
     this.product_thumb = product_thumb;
     this.product_description = product_description;
@@ -92,10 +104,19 @@ class Product {
     this.product_type = product_type;
     this.product_shop = product_shop;
     this.product_attributes = product_attributes;
+    this.product_quantity = product_quantity;
   }
 
   async createProduct(product_id) {
-    return await ProductModel.create({ ...this, _id: product_id });
+    const newProduct = await ProductModel.create({ ...this, _id: product_id });
+    if (newProduct) {
+      await insertInventory({
+        product_id,
+        shop_id: this.product_shop,
+        stock: this.product_quantity,
+      });
+    }
+    return newProduct;
   }
 
   async updateProduct(product_id, payload) {

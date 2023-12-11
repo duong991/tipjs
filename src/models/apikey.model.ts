@@ -1,9 +1,10 @@
 import { ApiKey } from '@/interfaces/apikey.interface';
 import { model, Schema, Document } from 'mongoose';
+import { RoleShop } from '@/constants';
 
 const DOCUMENT_NAME = 'ApiKey';
 const COLLECTION_NAME = 'ApiKeys';
-
+const { WRITER, SHOP, ADMIN } = RoleShop;
 const apiKeySchema: Schema = new Schema(
   {
     key: {
@@ -18,7 +19,7 @@ const apiKeySchema: Schema = new Schema(
     permissions: {
       type: [String],
       readonly: true,
-      enum: ['0000', '1111', '2222'],
+      enum: [WRITER, SHOP, ADMIN],
     },
   },
   {
