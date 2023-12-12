@@ -32,4 +32,4 @@ const InventorySchema: Schema = new Schema(
   },
 );
 
-export const InventoryModel = model<ApiKey & Document>(DOCUMENT_NAME, InventorySchema);
+export const InventoryModel = model(DOCUMENT_NAME, InventorySchema);
