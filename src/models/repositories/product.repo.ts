@@ -3,6 +3,10 @@ import { ProductModel, ClothingModel, ElectronicModel, FurnitureModel } from '@/
 import { Types } from 'mongoose';
 import { getSelectData, unGetSelectData } from '@/utils';
 
+/*==========================Check=================================*/
+const checkDiscountExists = async ({ model, filter }) => {
+  return await model.findOne({ ...filter }).lean();
+};
 /*==========================Find=================================*/
 
 const findAllDraftProductsForShop = async ({ query, limit = 50, skip = 0 }) => {
@@ -15,9 +19,8 @@ const findAllPublishProductsForShop = async ({ query, limit = 50, skip = 0 }) =>
 
 const findAllProducts = async ({ limit = 50, sort = 'ctime', page = 1, filter, select }) => {
   const skip = (page - 1) * limit;
-  const sortBy = sort === 'ctime' ? { _id: -1 } : { _id: 1 };
   const products = await ProductModel.find({ ...filter })
-    .sort(sortBy)
+    .sort({ _id: sort === 'ctime' ? -1 : 1 })
     .skip(skip)
     .limit(limit)
     .select(getSelectData(select))
@@ -88,6 +91,7 @@ const queyProduct = async ({ query, limit, skip }) => {
 };
 
 export {
+  checkDiscountExists,
   findAllDraftProductsForShop,
   findAllProducts,
   findProduct,

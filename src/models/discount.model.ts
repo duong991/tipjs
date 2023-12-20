@@ -1,3 +1,4 @@
+import { Discount } from '@/interfaces/discount.interface';
 import { model, Schema, Document } from 'mongoose';
 
 const DOCUMENT_NAME = 'Discount';
@@ -19,7 +20,7 @@ const DiscountSchema: Schema = new Schema(
     discount_shopId: { type: Schema.Types.ObjectId, ref: 'Shop', required: true },
 
     discount_is_active: { type: Boolean, required: true }, // trạng thái discount
-    discount_applies_to: { type: String, required: true }, // áp dụng cho
+    discount_applies_to: { type: String, require: true, enum: ['all', 'specific'] }, // áp dụng cho
     discount_productIds: { type: Array, default: [] }, // danh sách product áp dụng
   },
   {
@@ -28,4 +29,4 @@ const DiscountSchema: Schema = new Schema(
   },
 );
 
-export const DiscountModel = model(DOCUMENT_NAME, DiscountSchema);
+export const DiscountModel = model<Discount & Document>(DOCUMENT_NAME, DiscountSchema);

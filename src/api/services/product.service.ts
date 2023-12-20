@@ -84,7 +84,6 @@ class Product {
   product_type: string;
   product_shop: string;
   product_attributes: any;
-
   product_quantity: number;
 
   constructor({

@@ -35,6 +35,6 @@
       "@utils/*": ["utils/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.json", ".env"],
+  "include": ["src/**/*.ts", "src/**/*.json", ".env", "src/utils/faker.js"],
   "exclude": ["node_modules", "src/http", "src/logs"]
 }
