@@ -55,7 +55,10 @@ export class KeyTokenService {
     return tokens;
   };
 
-  public static updateRefreshTokenIsUsed = async (userId: string, refreshIsUsed: string): Promise<any> => {
+  public static updateRefreshTokenIsUsed = async (
+    userId: string,
+    refreshIsUsed: string,
+  ): Promise<any> => {
     const tokens = await KeyTokenModel.findOneAndUpdate(
       {
         user: new Types.ObjectId(userId),
@@ -71,7 +74,11 @@ export class KeyTokenService {
     return tokens;
   };
 
-  public static updateRefreshTokenAndRefreshTokenIsUsed = async (userId: string, refreshToken: string, refreshTokenIsUsed: string): Promise<any> => {
+  public static updateRefreshTokenAndRefreshTokenIsUsed = async (
+    userId: string,
+    refreshToken: string,
+    refreshTokenIsUsed: string,
+  ): Promise<any> => {
     const tokens = await KeyTokenModel.findOneAndUpdate(
       {
         user: new Types.ObjectId(userId),

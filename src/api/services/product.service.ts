@@ -1,4 +1,9 @@
-import { ProductModel, ClothingModel, ElectronicModel, FurnitureModel } from '@/models/product.model';
+import {
+  ProductModel,
+  ClothingModel,
+  ElectronicModel,
+  FurnitureModel,
+} from '@/models/product.model';
 import { IProduct } from '@/interfaces/product.interface';
 import { HttpException } from '@/helpers/exceptions/HttpException';
 import {
@@ -38,7 +43,11 @@ class ProductFactory {
     return await new productClass(payload).updateProduct(product_id);
   }
 
-  static async findAllDraftProductsForShop({ products_shop, limit = 50, skip = 0 }): Promise<IProduct[]> {
+  static async findAllDraftProductsForShop({
+    products_shop,
+    limit = 50,
+    skip = 0,
+  }): Promise<IProduct[]> {
     const query = {
       product_shop: new Types.ObjectId(products_shop),
       isDraft: true,
@@ -47,7 +56,11 @@ class ProductFactory {
     return await findAllDraftProductsForShop({ query, limit, skip });
   }
 
-  static async findAllPublishProductsForShop({ products_shop, limit = 50, skip = 0 }): Promise<IProduct[]> {
+  static async findAllPublishProductsForShop({
+    products_shop,
+    limit = 50,
+    skip = 0,
+  }): Promise<IProduct[]> {
     const query = {
       product_shop: new Types.ObjectId(products_shop),
       isPublished: true,
@@ -67,11 +80,25 @@ class ProductFactory {
     return await searchProductByUser({ keySearch });
   }
 
-  static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } }): Promise<IProduct[]> {
-    return await findAllProducts({ limit, sort, page, filter, select: ['product_name', 'product_price', 'product_thumb'] });
+  static async findAllProducts({
+    limit = 50,
+    sort = 'ctime',
+    page = 1,
+    filter = { isPublished: true },
+  }): Promise<IProduct[]> {
+    return await findAllProducts({
+      limit,
+      sort,
+      page,
+      filter,
+      select: ['product_name', 'product_price', 'product_thumb'],
+    });
   }
 
-  static async findProduct({ product_id, unSelect = ['__v', '_id', 'updatedAt'] }): Promise<IProduct> {
+  static async findProduct({
+    product_id,
+    unSelect = ['__v', '_id', 'updatedAt'],
+  }): Promise<IProduct> {
     return await findProduct({ product_id, unSelect });
   }
 }

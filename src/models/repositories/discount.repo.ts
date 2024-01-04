@@ -6,7 +6,13 @@ const fountDiscount = async ({ code, shopId }) =>
     discount_shopId: convertToObjetId(shopId),
   }).lean();
 
-const findAllDiscountCodeUnSelect = async ({ limit = 50, page = 1, sort = 'ctime', unSelect = [], filter }) => {
+const findAllDiscountCodeUnSelect = async ({
+  limit = 50,
+  page = 1,
+  sort = 'ctime',
+  unSelect = [],
+  filter,
+}) => {
   const skip = (page - 1) * limit;
   return await DiscountModel.find({ ...filter })
     .sort({ _id: sort === 'ctime' ? -1 : 1 })

@@ -22,7 +22,11 @@ export class ProductController {
   public getAllDraftProductsForShop = async (req, res: Response) => {
     const shopId = req.userId;
     const { limit, skip } = req.query;
-    const result = await ProductFactory.findAllDraftProductsForShop({ products_shop: shopId, limit, skip });
+    const result = await ProductFactory.findAllDraftProductsForShop({
+      products_shop: shopId,
+      limit,
+      skip,
+    });
     new OK({ message: 'Get all draft product', data: result }).send(res);
   };
 
@@ -34,7 +38,11 @@ export class ProductController {
   public getAllPublishProductsForShop = async (req, res: Response) => {
     const shopId = req.userId;
     const { limit, skip } = req.query;
-    const result = await ProductFactory.findAllPublishProductsForShop({ products_shop: shopId, limit, skip });
+    const result = await ProductFactory.findAllPublishProductsForShop({
+      products_shop: shopId,
+      limit,
+      skip,
+    });
     new OK({ message: 'Get all publish product', data: result }).send(res);
   };
 

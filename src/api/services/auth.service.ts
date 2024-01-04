@@ -1,4 +1,9 @@
-import { DataStoredInAccessToken, DataStoredInRefreshToken, ILoginData, ISignUpData } from '@/interfaces/auth.interface';
+import {
+  DataStoredInAccessToken,
+  DataStoredInRefreshToken,
+  ILoginData,
+  ISignUpData,
+} from '@/interfaces/auth.interface';
 import { hash, compare } from 'bcrypt';
 import { Service } from 'typedi';
 import { ShopModel } from '@/models/shop.model';
@@ -117,7 +122,8 @@ export class AuthService {
     }
 
     const foundShop = await findByEmail({ email });
-    if (!foundShop) throw new ForbiddenError({ message: 'Some thing wrong happen. Please relogin' });
+    if (!foundShop)
+      throw new ForbiddenError({ message: 'Some thing wrong happen. Please relogin' });
 
     // generate new token
     const payloadAccessToken: DataStoredInAccessToken = {
@@ -131,7 +137,11 @@ export class AuthService {
     const tokens = await generateTokens(payloadAccessToken, payloadRefreshToken, false);
 
     // update refresh token
-    await KeyTokenService.updateRefreshTokenAndRefreshTokenIsUsed(keyToken.user, tokens.refreshToken, refreshToken);
+    await KeyTokenService.updateRefreshTokenAndRefreshTokenIsUsed(
+      keyToken.user,
+      tokens.refreshToken,
+      refreshToken,
+    );
 
     return tokens;
   }

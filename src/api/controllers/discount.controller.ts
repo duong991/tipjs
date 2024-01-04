@@ -24,7 +24,13 @@ export class DiscountController {
     const { userId } = req.userId;
     new OK({
       message: 'Get all products with discount code successfully',
-      data: await DiscountService.getAllProductsWithDiscountCode({ code, shopId, userId, limit, page }),
+      data: await DiscountService.getAllProductsWithDiscountCode({
+        code,
+        shopId,
+        userId,
+        limit,
+        page,
+      }),
     }).send(res);
   };
 
@@ -63,5 +69,5 @@ export class DiscountController {
     new OK({ message: 'Delete discount code successfully', data: result }).send(res);
   };
 
-  public cancelDiscountCode = async (req, res: Response) => {};
+  // public cancelDiscountCode = async (req, res: Response) => {};
 }

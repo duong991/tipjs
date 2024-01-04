@@ -1,5 +1,10 @@
 import { HttpException } from '@/helpers/exceptions/HttpException';
-import { ProductModel, ClothingModel, ElectronicModel, FurnitureModel } from '@/models/product.model';
+import {
+  ProductModel,
+  ClothingModel,
+  ElectronicModel,
+  FurnitureModel,
+} from '@/models/product.model';
 import { Types } from 'mongoose';
 import { getSelectData, unGetSelectData } from '@/utils';
 
@@ -70,7 +75,10 @@ const searchProductByUser = async ({ keySearch, limit = 50, skip = 0 }) => {
 /*==========================Utils=================================*/
 
 const setPublishedStatusProductByShop = async ({ product_shop, product_id, isPublished }) => {
-  const foundShop = await ProductModel.findOne({ _id: new Types.ObjectId(product_id), product_shop: new Types.ObjectId(product_shop) });
+  const foundShop = await ProductModel.findOne({
+    _id: new Types.ObjectId(product_id),
+    product_shop: new Types.ObjectId(product_shop),
+  });
 
   if (!foundShop) throw new HttpException(404, 'Product not found');
   foundShop.isDraft = !isPublished;

@@ -37,7 +37,12 @@ class DiscountService {
       max_uses_per_user,
     } = payload;
 
-    if (timezone7() < new Date(start_date || timezone7() < new Date(end_date) || new Date(start_date) > new Date(end_date))) {
+    if (
+      timezone7() <
+      new Date(
+        start_date || timezone7() < new Date(end_date) || new Date(start_date) > new Date(end_date),
+      )
+    ) {
       throw new HttpException(400, 'Invalid date');
     }
 
@@ -78,7 +83,13 @@ class DiscountService {
   /**
    *  @description Get all product have discount code [User]
    * */
-  static async getAllProductsWithDiscountCode({ code, shopId, userId, limit, page }): Promise<IProduct[]> {
+  static async getAllProductsWithDiscountCode({
+    code,
+    shopId,
+    userId,
+    limit,
+    page,
+  }): Promise<IProduct[]> {
     const foundDiscount = await checkDiscountExists({
       model: DiscountModel,
       filter: { discount_code: code, discount_shopId: convertToObjetId(shopId) },
@@ -172,7 +183,11 @@ class DiscountService {
 
     if (
       timezone7() <
-      new Date(discount_start_date || timezone7() < new Date(discount_end_date) || new Date(discount_start_date) > new Date(discount_end_date))
+      new Date(
+        discount_start_date ||
+          timezone7() < new Date(discount_end_date) ||
+          new Date(discount_start_date) > new Date(discount_end_date),
+      )
     ) {
       throw new HttpException(400, 'Invalid date');
     }
@@ -205,7 +220,7 @@ class DiscountService {
         }
       }
     }
-    if (discount_type === 'percent') {
+    if (discount_type === 'percentage') {
       discountPercent = discount_value;
       discountAmount = (discountPercent / 100) * totalAmount;
       discountMaxValue = discountMaxValue > discountAmount ? discountMaxValue : discountAmount;
