@@ -3,8 +3,10 @@ import { AuthController } from '@/api/controllers/auth.controller';
 import { Routes } from '@interfaces/routes.interface';
 // import { AuthMiddleware } from '@middlewares/auth.middleware';
 import { ValidationMiddleware } from '@middlewares/validation.middleware';
-import asyncHandler from '@/helpers/asyncHandler';
 import { AuthMiddleware } from '@/middlewares/auth.middleware';
+import { route } from '@/interfaces/router.interface';
+import { createRoute } from '@/helpers/routeHelper';
+import { _methods } from '@/constants';
 export class AuthRoute implements Routes {
   public path = '/auth';
   public router = Router();
@@ -15,10 +17,59 @@ export class AuthRoute implements Routes {
   }
 
   private initializeRoutes() {
-    this.router.post(`${this.path}/signup`, asyncHandler(this.auth.signUp));
-    this.router.post(`${this.path}/login`, asyncHandler(this.auth.login));
+    const routes: route[] = [
+      /*
+       * @route: POST /auth/signup
+       * TODO: Sign up
+       */
+      {
+        path: '/signup',
+        method: _methods.POST,
+        handler: this.auth.signUp,
+      },
 
-    this.router.post(`${this.path}/logout`, AuthMiddleware, asyncHandler(this.auth.logout));
-    this.router.post(`${this.path}/refresh-token`, AuthMiddleware, asyncHandler(this.auth.refreshToken));
+      /*
+       * @route: POST /auth/login
+       * TODO: Login
+       */
+      {
+        path: '/login',
+        method: _methods.POST,
+        handler: this.auth.login,
+      },
+
+      /*
+       * @route: POST /auth/logout
+       * TODO: Logout
+       */
+      {
+        path: '/logout',
+        method: _methods.POST,
+        middlewares: [AuthMiddleware],
+        handler: this.auth.logout,
+      },
+
+      /*
+       * @route: POST /auth/refresh-token
+       * TODO: Refresh token
+       */
+      {
+        path: '/refresh-token',
+        method: _methods.POST,
+        middlewares: [AuthMiddleware],
+        handler: this.auth.refreshToken,
+      },
+    ];
+
+    routes.forEach(route => {
+      createRoute(
+        this.router,
+        this.path,
+        route.path,
+        route.method,
+        route.handler,
+        route.middlewares,
+      );
+    });
   }
 }

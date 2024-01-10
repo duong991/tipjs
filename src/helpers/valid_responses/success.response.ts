@@ -6,7 +6,17 @@ export default class SuccessResponse {
   public reasonStatusCode: string;
   public data: any;
 
-  constructor({ message, statusCode, reasonStatusCode, data }: { message: string; statusCode: number; reasonStatusCode: string; data: any }) {
+  constructor({
+    message,
+    statusCode,
+    reasonStatusCode,
+    data,
+  }: {
+    message: string;
+    statusCode: number;
+    reasonStatusCode: string;
+    data: any;
+  }) {
     this.message = message;
     this.statusCode = statusCode;
     this.reasonStatusCode = reasonStatusCode;
@@ -18,14 +28,19 @@ export default class SuccessResponse {
       status: 'success',
       message: this.message,
       statusCode: this.statusCode,
-      reasonStatusCode: this.reasonStatusCode,
       data: this.data,
     });
   }
 }
 
 class OK extends SuccessResponse {
-  constructor({ message = ReasonPhrases.OK, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.OK,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.OK,
@@ -36,7 +51,13 @@ class OK extends SuccessResponse {
 }
 
 class Created extends SuccessResponse {
-  constructor({ message = ReasonPhrases.CREATED, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.CREATED,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.CREATED,
@@ -47,7 +68,13 @@ class Created extends SuccessResponse {
 }
 
 class Accepted extends SuccessResponse {
-  constructor({ message = ReasonPhrases.ACCEPTED, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.ACCEPTED,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.ACCEPTED,
@@ -58,7 +85,13 @@ class Accepted extends SuccessResponse {
 }
 
 class NoContent extends SuccessResponse {
-  constructor({ message = ReasonPhrases.NO_CONTENT, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.NO_CONTENT,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.NO_CONTENT,
@@ -69,7 +102,13 @@ class NoContent extends SuccessResponse {
 }
 
 class ResetContent extends SuccessResponse {
-  constructor({ message = ReasonPhrases.RESET_CONTENT, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.RESET_CONTENT,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.RESET_CONTENT,
@@ -80,7 +119,13 @@ class ResetContent extends SuccessResponse {
 }
 
 class PartialContent extends SuccessResponse {
-  constructor({ message = ReasonPhrases.PARTIAL_CONTENT, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.PARTIAL_CONTENT,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.PARTIAL_CONTENT,
@@ -91,7 +136,13 @@ class PartialContent extends SuccessResponse {
 }
 
 class MultiStatus extends SuccessResponse {
-  constructor({ message = ReasonPhrases.MULTI_STATUS, data = null }: { message?: string; data?: any }) {
+  constructor({
+    message = ReasonPhrases.MULTI_STATUS,
+    data = null,
+  }: {
+    message?: string;
+    data?: any;
+  }) {
     super({
       message,
       statusCode: StatusCodes.MULTI_STATUS,
@@ -101,4 +152,12 @@ class MultiStatus extends SuccessResponse {
   }
 }
 
-export { OK, Created, Accepted, NoContent, ResetContent, PartialContent, MultiStatus };
+export {
+  OK,
+  Created,
+  Accepted,
+  NoContent,
+  ResetContent,
+  PartialContent,
+  MultiStatus,
+};

@@ -108,7 +108,10 @@ const FurnitureSchema: Schema = new Schema(
   },
 );
 
-export const ProductModel = model<IProduct & Document>(DOCUMENT_NAME, ProductSchema);
+export const ProductModel = model<IProduct & Document>(
+  DOCUMENT_NAME,
+  ProductSchema,
+);
 export const ClothingModel = model('Clothing', ClothingSchema);
 export const ElectronicModel = model('Electronic', ElectronicSchema);
 export const FurnitureModel = model('Furniture', FurnitureSchema);

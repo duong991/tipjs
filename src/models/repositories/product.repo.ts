@@ -6,7 +6,7 @@ import {
   FurnitureModel,
 } from '@/models/product.model';
 import { Types } from 'mongoose';
-import { getSelectData, unGetSelectData } from '@/utils';
+import { convertToObjetId, getSelectData, unGetSelectData } from '@/utils';
 
 /*==========================Check=================================*/
 const checkDiscountExists = async ({ model, filter }) => {
@@ -18,11 +18,21 @@ const findAllDraftProductsForShop = async ({ query, limit = 50, skip = 0 }) => {
   return await queyProduct({ query, limit, skip });
 };
 
-const findAllPublishProductsForShop = async ({ query, limit = 50, skip = 0 }) => {
+const findAllPublishProductsForShop = async ({
+  query,
+  limit = 50,
+  skip = 0,
+}) => {
   return await queyProduct({ query, limit, skip });
 };
 
-const findAllProducts = async ({ limit = 50, sort = 'ctime', page = 1, filter, select }) => {
+const findAllProducts = async ({
+  limit = 50,
+  sort = 'ctime',
+  page = 1,
+  filter,
+  select,
+}) => {
   const skip = (page - 1) * limit;
   const products = await ProductModel.find({ ...filter })
     .sort({ _id: sort === 'ctime' ? -1 : 1 })
@@ -34,20 +44,65 @@ const findAllProducts = async ({ limit = 50, sort = 'ctime', page = 1, filter, s
   return products;
 };
 
-const findProduct = async ({ product_id, unSelect }) => {
-  return await ProductModel.findById(product_id).select(unGetSelectData(unSelect)).lean();
+const findProduct = async ({ query, select = [] }) => {
+  const newQuery = {
+    ...query,
+    isPublished: true,
+  };
+  return await ProductModel.findOne({ ...newQuery })
+    .select(getSelectData(select))
+    .lean();
+};
+
+const findProducts = async ({ query, select = [] }) => {
+  const newQuery = {
+    ...query,
+    isPublished: true,
+  };
+  return await ProductModel.find({ ...newQuery })
+    .select(getSelectData(select))
+    .lean();
+};
+
+const findProductById = async ({ product_id }) => {
+  return await ProductModel.findById(product_id).lean();
+};
+
+const findProductWithoutSelect = async ({ product_id, unSelect }) => {
+  return await ProductModel.findById(product_id)
+    .select(unGetSelectData(unSelect))
+    .lean();
+};
+
+const findProductWithSelect = async ({ product_id, selected }) => {
+  return await ProductModel.findById(convertToObjetId(product_id))
+    .select(getSelectData(selected))
+    .lean();
 };
 /*==========================Update=================================*/
 
 const publicProductByShop = async ({ product_shop, product_id }) => {
-  return await setPublishedStatusProductByShop({ product_shop, product_id, isPublished: true });
+  return await setPublishedStatusProductByShop({
+    product_shop,
+    product_id,
+    isPublished: true,
+  });
 };
 
 const unPublishedProductByShop = async ({ product_shop, product_id }) => {
-  return await setPublishedStatusProductByShop({ product_shop, product_id, isPublished: false });
+  return await setPublishedStatusProductByShop({
+    product_shop,
+    product_id,
+    isPublished: false,
+  });
 };
 
-const updateProductById = async ({ product_id, payload, model, isNew = true }) => {
+const updateProductById = async ({
+  product_id,
+  payload,
+  model,
+  isNew = true,
+}) => {
   return await model.updateProductById(product_id, payload, { new: isNew });
 };
 /*==========================Search=================================*/
@@ -74,7 +129,11 @@ const searchProductByUser = async ({ keySearch, limit = 50, skip = 0 }) => {
 
 /*==========================Utils=================================*/
 
-const setPublishedStatusProductByShop = async ({ product_shop, product_id, isPublished }) => {
+const setPublishedStatusProductByShop = async ({
+  product_shop,
+  product_id,
+  isPublished,
+}) => {
   const foundShop = await ProductModel.findOne({
     _id: new Types.ObjectId(product_id),
     product_shop: new Types.ObjectId(product_shop),
@@ -103,7 +162,11 @@ export {
   findAllDraftProductsForShop,
   findAllProducts,
   findProduct,
+  findProducts,
+  findProductById,
+  findProductWithoutSelect,
   findAllPublishProductsForShop,
+  findProductWithSelect,
   publicProductByShop,
   unPublishedProductByShop,
   searchProductByUser,

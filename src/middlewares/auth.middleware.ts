@@ -1,10 +1,18 @@
 import { NextFunction, Request, Response } from 'express';
-import { DataStoredInAccessToken, DataStoredInRefreshToken, RequestWithRefreshToken, RequestWithUser } from '@/interfaces/auth.interface';
+import {
+  DataStoredInAccessToken,
+  DataStoredInRefreshToken,
+  RequestWithRefreshToken,
+  RequestWithUser,
+} from '@/interfaces/auth.interface';
 import { HEADER } from '@/constants';
 import { HttpException } from '@/helpers/exceptions/HttpException';
 import { KeyTokenService } from '@/api/services/keyToken.service';
 import { verifyToken } from '@/auth/authUtils';
-import { NotFoundError, Unauthorized } from '@/helpers/valid_responses/error.response';
+import {
+  NotFoundError,
+  Unauthorized,
+} from '@/helpers/valid_responses/error.response';
 const getAuthorization = req => {
   const cookie = req.cookies['Authorization'];
   if (cookie) return cookie;
@@ -15,7 +23,11 @@ const getAuthorization = req => {
   return null;
 };
 
-export const AuthMiddleware = async (req, res: Response, next: NextFunction) => {
+export const AuthMiddleware = async (
+  req,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const userId = req.headers[HEADER.CLIENT_ID] as string;
 
@@ -31,7 +43,10 @@ export const AuthMiddleware = async (req, res: Response, next: NextFunction) => 
     ///========================= handle refresh token =========================
     if (req.headers[HEADER.REFRESH_TOKEN]) {
       const refreshToken = req.headers[HEADER.REFRESH_TOKEN] as string;
-      const decodeRefreshToken = (await verifyToken(refreshToken, key.publicKey)) as DataStoredInRefreshToken;
+      const decodeRefreshToken = (await verifyToken(
+        refreshToken,
+        key.publicKey,
+      )) as DataStoredInRefreshToken;
       if (userId !== decodeRefreshToken.userId) {
         throw new Unauthorized({ message: 'Invalid User' });
       }
@@ -49,7 +64,10 @@ export const AuthMiddleware = async (req, res: Response, next: NextFunction) => 
       throw new Unauthorized({ message: 'Invalid Request' });
     }
 
-    const decodeUser = (await verifyToken(accessToken, key.publicKey)) as DataStoredInAccessToken;
+    const decodeUser = (await verifyToken(
+      accessToken,
+      key.publicKey,
+    )) as DataStoredInAccessToken;
     if (userId !== decodeUser.userId) {
       throw new Unauthorized({ message: 'Invalid User' });
     }

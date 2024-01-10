@@ -13,7 +13,7 @@ if (!existsSync(logDir)) {
 
 // Define log format
 const logFormat = winston.format.printf(
-  ({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`,
+  ({ timestamp, level, message }) => `${timestamp} ${level}: ${message} `,
 );
 
 /*
@@ -54,7 +54,12 @@ const logger = winston.createLogger({
 
 logger.add(
   new winston.transports.Console({
-    format: winston.format.combine(winston.format.splat(), winston.format.colorize()),
+    format: winston.format.combine(
+      winston.format.splat(),
+      winston.format.simple(),
+      logFormat,
+      winston.format.colorize({ all: true }),
+    ),
   }),
 );
 

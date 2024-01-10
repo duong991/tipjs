@@ -11,7 +11,9 @@ export class ProductController {
     const productData: IProduct = { ...req.body, product_shop: req.userId };
     const productType = productData.product_type;
     const result = await ProductFactory.createProduct(productType, productData);
-    new Created({ message: 'Product created successfully', data: result }).send(res);
+    new Created({ message: 'Product created successfully', data: result }).send(
+      res,
+    );
   };
 
   /**
@@ -53,7 +55,10 @@ export class ProductController {
   public publishProductByShop = async (req, res: Response) => {
     const shopId = req.userId;
     const { product_id } = req.params;
-    const result = await ProductFactory.publicProductByShop({ product_shop: shopId, product_id });
+    const result = await ProductFactory.publicProductByShop({
+      product_shop: shopId,
+      product_id,
+    });
     new OK({ message: 'Get public product', data: result }).send(res);
   };
 
@@ -66,7 +71,10 @@ export class ProductController {
     const { product_id } = req.params;
     new OK({
       message: 'Get un publish product',
-      data: await ProductFactory.unPublishedProductByShop({ product_shop: shopId, product_id }),
+      data: await ProductFactory.unPublishedProductByShop({
+        product_shop: shopId,
+        product_id,
+      }),
     }).send(res);
   };
 
@@ -118,7 +126,11 @@ export class ProductController {
     const { product_id } = req.params;
     const productData: IProduct = { ...req.body, product_shop: req.userId };
     const productType = productData.product_type;
-    const result = await ProductFactory.updateProduct(productType, product_id, productData);
+    const result = await ProductFactory.updateProduct(
+      productType,
+      product_id,
+      productData,
+    );
     new OK({
       message: 'Update product',
       data: result,

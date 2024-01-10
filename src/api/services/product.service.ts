@@ -13,8 +13,8 @@ import {
   publicProductByShop,
   searchProductByUser,
   unPublishedProductByShop,
-  findProduct,
   updateProductById,
+  findProductWithoutSelect,
 } from '@/models/repositories/product.repo';
 import { Types } from 'mongoose';
 import { removeUndefinedObject, updateNestedObject } from '@/utils';
@@ -37,7 +37,11 @@ class ProductFactory {
     return await new productClass(payload).createProduct();
   }
 
-  static async updateProduct(type, product_id, payload: IProduct): Promise<IProduct> {
+  static async updateProduct(
+    type,
+    product_id,
+    payload: IProduct,
+  ): Promise<IProduct> {
     const productClass = ProductFactory.productRegistry[type];
     if (!productClass) throw new HttpException(400, 'Type not supported');
     return await new productClass(payload).updateProduct(product_id);
@@ -68,11 +72,17 @@ class ProductFactory {
     return await findAllPublishProductsForShop({ query, limit, skip });
   }
 
-  static async publicProductByShop({ product_shop, product_id }): Promise<IProduct> {
+  static async publicProductByShop({
+    product_shop,
+    product_id,
+  }): Promise<IProduct> {
     return await publicProductByShop({ product_shop, product_id });
   }
 
-  static async unPublishedProductByShop({ product_shop, product_id }): Promise<IProduct> {
+  static async unPublishedProductByShop({
+    product_shop,
+    product_id,
+  }): Promise<IProduct> {
     return await unPublishedProductByShop({ product_shop, product_id });
   }
 
@@ -99,7 +109,7 @@ class ProductFactory {
     product_id,
     unSelect = ['__v', '_id', 'updatedAt'],
   }): Promise<IProduct> {
-    return await findProduct({ product_id, unSelect });
+    return await findProductWithoutSelect({ product_id, unSelect });
   }
 }
 
@@ -146,7 +156,11 @@ class Product {
   }
 
   async updateProduct(product_id, payload) {
-    return await updateProductById({ product_id, payload, model: ProductModel });
+    return await updateProductById({
+      product_id,
+      payload,
+      model: ProductModel,
+    });
   }
 }
 
@@ -170,7 +184,10 @@ class Clothing extends Product {
       await updateProductById({ product_id, payload, model: ClothingModel });
     }
 
-    const updateProduct = await super.updateProduct(product_id, updateNestedObject(objectParams));
+    const updateProduct = await super.updateProduct(
+      product_id,
+      updateNestedObject(objectParams),
+    );
     if (!updateProduct) throw new HttpException(400, 'Update product failed');
     return updateProduct;
   }
@@ -181,7 +198,8 @@ class Electronic extends Product {
       ...this.product_attributes,
       product_shop: this.product_shop,
     });
-    if (!newElectronic) throw new HttpException(400, 'Create electronic failed');
+    if (!newElectronic)
+      throw new HttpException(400, 'Create electronic failed');
 
     const newProduct = await super.createProduct(newElectronic._id);
     if (!newProduct) throw new HttpException(400, 'Create product failed');
@@ -195,7 +213,10 @@ class Electronic extends Product {
       await updateProductById({ product_id, payload, model: ElectronicModel });
     }
 
-    const updateProduct = await super.updateProduct(product_id, updateNestedObject(objectParams));
+    const updateProduct = await super.updateProduct(
+      product_id,
+      updateNestedObject(objectParams),
+    );
     if (!updateProduct) throw new HttpException(400, 'Update product failed');
     return updateProduct;
   }
@@ -221,7 +242,10 @@ class Furniture extends Product {
       await updateProductById({ product_id, payload, model: FurnitureModel });
     }
 
-    const updateProduct = await super.updateProduct(product_id, updateNestedObject(objectParams));
+    const updateProduct = await super.updateProduct(
+      product_id,
+      updateNestedObject(objectParams),
+    );
     if (!updateProduct) throw new HttpException(400, 'Update product failed');
     return updateProduct;
   }

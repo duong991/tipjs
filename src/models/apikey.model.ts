@@ -28,4 +28,7 @@ const apiKeySchema: Schema = new Schema(
   },
 );
 
-export const ApiKeyModel = model<ApiKey & Document>(DOCUMENT_NAME, apiKeySchema);
+export const ApiKeyModel = model<ApiKey & Document>(
+  DOCUMENT_NAME,
+  apiKeySchema,
+);

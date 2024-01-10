@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import { Container } from 'typedi';
 import { AuthService } from '@/api/services/auth.service';
-import { ILoginData, ISignUpData, RequestWithUser } from '@interfaces/auth.interface';
+import {
+  ILoginData,
+  ISignUpData,
+  RequestWithUser,
+} from '@interfaces/auth.interface';
 import { Created, OK } from '@/helpers/valid_responses/success.response';
 import getDataInfo from '@/utils/getInfoData';
 import { Key } from '@/interfaces/key.interface';
@@ -49,7 +53,11 @@ export class AuthController {
       email: req.email,
     };
     const refreshToken = req.refreshToken as string;
-    const tokens = await this.auth.handleRefreshToken(keyStore, user, refreshToken);
+    const tokens = await this.auth.handleRefreshToken(
+      keyStore,
+      user,
+      refreshToken,
+    );
     new OK({
       message: 'Shop successfully refresh token',
       data: {

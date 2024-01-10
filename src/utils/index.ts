@@ -24,7 +24,9 @@ const unGetSelectData = (select: String[]) => {
  * @return Object eg. Object {a: 1, b: undefined} => Object {a: 1}
  * */
 const removeUndefinedObject = obj => {
-  Object.keys(obj).forEach(key => (obj[key] === undefined || obj[key] === null) && delete obj[key]);
+  Object.keys(obj).forEach(
+    key => (obj[key] === undefined || obj[key] === null) && delete obj[key],
+  );
   return obj;
 };
 
@@ -55,4 +57,10 @@ const updateNestedObject = obj => {
  * */
 const convertToObjetId = (ids: string) => new Types.ObjectId(ids);
 
-export { getSelectData, convertToObjetId, unGetSelectData, removeUndefinedObject, updateNestedObject };
+export {
+  getSelectData,
+  convertToObjetId,
+  unGetSelectData,
+  removeUndefinedObject,
+  updateNestedObject,
+};

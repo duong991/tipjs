@@ -2,7 +2,10 @@ import { timezone7 } from '@utils/dateUtils';
 import { HttpException } from '@/helpers/exceptions/HttpException';
 import { DiscountModel } from '@/models/discount.model';
 import { convertToObjetId, removeUndefinedObject } from '@/utils';
-import { checkDiscountExists, findAllProducts } from '@/models/repositories/product.repo';
+import {
+  checkDiscountExists,
+  findAllProducts,
+} from '@/models/repositories/product.repo';
 import { findAllDiscountCodeUnSelect } from '@/models/repositories/discount.repo';
 import { Discount } from '@/interfaces/discount.interface';
 import { IProduct } from '@/interfaces/product.interface';
@@ -40,7 +43,9 @@ class DiscountService {
     if (
       timezone7() <
       new Date(
-        start_date || timezone7() < new Date(end_date) || new Date(start_date) > new Date(end_date),
+        start_date ||
+          timezone7() < new Date(end_date) ||
+          new Date(start_date) > new Date(end_date),
       )
     ) {
       throw new HttpException(400, 'Invalid date');
@@ -48,7 +53,10 @@ class DiscountService {
 
     const foundDiscount = await checkDiscountExists({
       model: DiscountModel,
-      filter: { discount_code: code, discount_shopId: convertToObjetId(shopId) },
+      filter: {
+        discount_code: code,
+        discount_shopId: convertToObjetId(shopId),
+      },
     });
 
     if (foundDiscount && foundDiscount.discount_is_active) {
@@ -86,13 +94,15 @@ class DiscountService {
   static async getAllProductsWithDiscountCode({
     code,
     shopId,
-    userId,
     limit,
     page,
   }): Promise<IProduct[]> {
     const foundDiscount = await checkDiscountExists({
       model: DiscountModel,
-      filter: { discount_code: code, discount_shopId: convertToObjetId(shopId) },
+      filter: {
+        discount_code: code,
+        discount_shopId: convertToObjetId(shopId),
+      },
     });
 
     if (!foundDiscount || !foundDiscount.discount_is_active) {
@@ -157,7 +167,10 @@ class DiscountService {
   static async getDiscountAmount({ code, userId, shopId, products }) {
     const foundDiscount = await checkDiscountExists({
       model: DiscountModel,
-      filter: { discount_code: code, discount_shopId: convertToObjetId(shopId) },
+      filter: {
+        discount_code: code,
+        discount_shopId: convertToObjetId(shopId),
+      },
     });
 
     if (!foundDiscount || !foundDiscount.discount_is_active) {
@@ -175,62 +188,47 @@ class DiscountService {
       discount_max_uses_per_user,
     } = foundDiscount;
 
-    let totalDiscount = 0;
-    let totalAmount = 0;
-    let discountPercent = 0;
-    let discountAmount = 0;
-    let discountMaxValue = 0;
+    const currentTime = timezone7();
+    const startDate = new Date(discount_start_date);
+    const endDate = new Date(discount_end_date);
 
-    if (
-      timezone7() <
-      new Date(
-        discount_start_date ||
-          timezone7() < new Date(discount_end_date) ||
-          new Date(discount_start_date) > new Date(discount_end_date),
-      )
-    ) {
+    if (currentTime < startDate || currentTime > endDate) {
       throw new HttpException(400, 'Invalid date');
     }
 
-    if (discount_applies_to === 'all') {
-      totalAmount = products.reduce((total, product) => {
-        return total + product.product_price * product.product_quantity;
-      }, 0);
-    }
+    // calculate total amount (tổng tiền)
+    const totalAmount = products.reduce((total, product) => {
+      const shouldApplyDiscount =
+        discount_applies_to === 'all' ||
+        discount_productIds.includes(product.product_id);
+      return shouldApplyDiscount
+        ? total + product.product_price * product.product_quantity
+        : total;
+    }, 0);
 
-    if (discount_applies_to === 'specific') {
-      totalAmount = products.reduce((total, product) => {
-        const foundProduct = discount_productIds.find(id => id === product.product_id);
-        if (foundProduct) {
-          return total + product.product_price * product.product_quantity;
-        }
-        return total;
-      }, 0);
-    }
-
+    // check min order amount (số tiền tối thiểu để sử dụng discount)
     if (discount_min_order_amount > totalAmount) {
       throw new HttpException(400, 'Minimum order amount not reached');
     }
 
+    // check max uses (số lần sử dụng còn không)
     if (discount_max_uses_per_user > 0) {
-      const foundUser = foundDiscount.discount_users_used.find(user => user.userId === userId);
-      if (foundUser) {
-        if (foundUser.uses >= discount_max_uses_per_user) {
-          throw new HttpException(400, 'Discount code has been used');
-        }
+      const foundUser = foundDiscount.discount_users_used.find(
+        user => user.userId === userId,
+      );
+      if (foundUser && foundUser.uses >= discount_max_uses_per_user) {
+        throw new HttpException(400, 'Discount code has been used');
       }
     }
-    if (discount_type === 'percentage') {
-      discountPercent = discount_value;
-      discountAmount = (discountPercent / 100) * totalAmount;
-      discountMaxValue = discountMaxValue > discountAmount ? discountMaxValue : discountAmount;
-    }
 
-    if (discount_type === 'fixed') {
-      discountAmount = discount_value;
-      discountMaxValue = discountMaxValue > discountAmount ? discountMaxValue : discountAmount;
-    }
-    totalDiscount = totalAmount - discountMaxValue;
+    // calculate discount amount (tiền chiet khau)
+    const discountAmount =
+      discount_type === 'percentage'
+        ? (discount_value / 100) * totalAmount
+        : discount_value;
+
+    // calculate total discount (tổng tiền sau chiet khau)
+    const totalDiscount = Math.max(0, totalAmount - discountAmount);
     return {
       totalAmount,
       discountAmount,
@@ -256,7 +254,10 @@ class DiscountService {
   static async cancelDiscountCode({ shopId, code, userId }) {
     const foundDisCount = await checkDiscountExists({
       model: DiscountModel,
-      filter: { discount_code: code, discount_shopId: convertToObjetId(shopId) },
+      filter: {
+        discount_code: code,
+        discount_shopId: convertToObjetId(shopId),
+      },
     });
 
     if (!foundDisCount) {

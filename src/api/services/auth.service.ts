@@ -55,7 +55,10 @@ export class AuthService {
         email: newShop.email,
       };
       const tokens = await generateTokens(payloadAccess, payloadRefresh, true);
-      await KeyTokenService.updateRefreshToken(newShop._id, tokens.refreshToken);
+      await KeyTokenService.updateRefreshToken(
+        newShop._id,
+        tokens.refreshToken,
+      );
 
       return {
         tokens,
@@ -74,7 +77,9 @@ export class AuthService {
     const { email, password, refreshToken } = data;
 
     const shop = await findByEmail({ email });
-    const isCreateNewKey = (await KeyTokenService.findByUserId(shop._id)) ? false : true;
+    const isCreateNewKey = (await KeyTokenService.findByUserId(shop._id))
+      ? false
+      : true;
     if (!shop) {
       throw new HttpException(409, `This email ${email} not exists`);
     }
@@ -93,7 +98,11 @@ export class AuthService {
       email: shop.email,
     };
 
-    const tokens = await generateTokens(payloadAccess, payloadRefresh, isCreateNewKey);
+    const tokens = await generateTokens(
+      payloadAccess,
+      payloadRefresh,
+      isCreateNewKey,
+    );
     await KeyTokenService.updateRefreshToken(shop._id, tokens.refreshToken);
 
     return {
@@ -110,20 +119,30 @@ export class AuthService {
     return delKey;
   }
 
-  public async handleRefreshToken(keyToken: Key, user: any, refreshToken: string) {
+  public async handleRefreshToken(
+    keyToken: Key,
+    user: any,
+    refreshToken: string,
+  ) {
     const { userId, email } = user;
     if (keyToken.refreshTokenUsed.includes(refreshToken)) {
       await KeyTokenService.removeKeyById(userId);
-      throw new ForbiddenError({ message: 'Some thing wrong happen. Please relogin' });
+      throw new ForbiddenError({
+        message: 'Some thing wrong happen. Please relogin',
+      });
     }
 
     if (keyToken.refreshToken !== refreshToken) {
-      throw new ForbiddenError({ message: 'Some thing wrong happen. Please relogin' });
+      throw new ForbiddenError({
+        message: 'Some thing wrong happen. Please relogin',
+      });
     }
 
     const foundShop = await findByEmail({ email });
     if (!foundShop)
-      throw new ForbiddenError({ message: 'Some thing wrong happen. Please relogin' });
+      throw new ForbiddenError({
+        message: 'Some thing wrong happen. Please relogin',
+      });
 
     // generate new token
     const payloadAccessToken: DataStoredInAccessToken = {
@@ -134,7 +153,11 @@ export class AuthService {
       userId: userId,
       email: email,
     };
-    const tokens = await generateTokens(payloadAccessToken, payloadRefreshToken, false);
+    const tokens = await generateTokens(
+      payloadAccessToken,
+      payloadRefreshToken,
+      false,
+    );
 
     // update refresh token
     await KeyTokenService.updateRefreshTokenAndRefreshTokenIsUsed(

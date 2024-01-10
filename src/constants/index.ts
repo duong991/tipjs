@@ -11,4 +11,12 @@ const HEADER = {
   REFRESH_TOKEN: 'refresh-token',
 };
 
-export { RoleShop, HEADER };
+const _methods = {
+  GET: 'get',
+  POST: 'post',
+  PUT: 'put',
+  PATCH: 'patch',
+  DELETE: 'delete',
+} as const;
+
+export { RoleShop, HEADER, _methods };

@@ -1,3 +1,4 @@
+import { IError } from '@/interfaces/response.interface';
 import { HttpException } from '../exceptions/HttpException';
 import { ReasonPhrases, StatusCodes } from '../httpStatusCode';
 
@@ -13,7 +14,7 @@ export default class ErrorResponse extends HttpException {
 }
 
 class BadRequest extends ErrorResponse {
-  constructor({ message = ReasonPhrases.BAD_REQUEST }: { message?: string; data?: any }) {
+  constructor({ message = ReasonPhrases.BAD_REQUEST }: IError) {
     super({
       message,
       status: StatusCodes.BAD_REQUEST,
@@ -22,7 +23,7 @@ class BadRequest extends ErrorResponse {
 }
 
 class Unauthorized extends ErrorResponse {
-  constructor({ message = ReasonPhrases.UNAUTHORIZED }: { message?: string; data?: any }) {
+  constructor({ message = ReasonPhrases.UNAUTHORIZED }: IError) {
     super({
       message,
       status: StatusCodes.UNAUTHORIZED,
@@ -31,7 +32,7 @@ class Unauthorized extends ErrorResponse {
 }
 
 class ForbiddenError extends ErrorResponse {
-  constructor({ message = ReasonPhrases.FORBIDDEN }: { message?: string; data?: any }) {
+  constructor({ message = ReasonPhrases.FORBIDDEN }: IError) {
     super({
       message,
       status: StatusCodes.FORBIDDEN,
@@ -40,7 +41,7 @@ class ForbiddenError extends ErrorResponse {
 }
 
 class NotFoundError extends ErrorResponse {
-  constructor({ message = ReasonPhrases.NOT_FOUND }: { message?: string; data?: any }) {
+  constructor({ message = ReasonPhrases.NOT_FOUND }: IError) {
     super({
       message,
       status: StatusCodes.NOT_FOUND,
@@ -49,7 +50,7 @@ class NotFoundError extends ErrorResponse {
 }
 
 class InternalServerError extends ErrorResponse {
-  constructor({ message = ReasonPhrases.INTERNAL_SERVER_ERROR }: { message?: string; data?: any }) {
+  constructor({ message = ReasonPhrases.INTERNAL_SERVER_ERROR }: IError) {
     super({
       message,
       status: StatusCodes.INTERNAL_SERVER_ERROR,
@@ -57,4 +58,10 @@ class InternalServerError extends ErrorResponse {
   }
 }
 
-export { BadRequest, Unauthorized, ForbiddenError, NotFoundError, InternalServerError };
+export {
+  BadRequest,
+  Unauthorized,
+  ForbiddenError,
+  NotFoundError,
+  InternalServerError,
+};
