@@ -1,7 +1,10 @@
 import { KeyTokenService } from '@/api/services/keyToken.service';
 import { createTokenPair } from '@/auth/authUtils';
 import { HttpException } from '@/helpers/exceptions/HttpException';
-import { DataStoredInAccessToken, DataStoredInRefreshToken } from '@/interfaces/auth.interface';
+import {
+  DataStoredInAccessToken,
+  DataStoredInRefreshToken,
+} from '@/interfaces/auth.interface';
 import crypto from 'crypto';
 
 /*
@@ -43,7 +46,12 @@ const generateTokens = async (
 
   if (!publicKeyString) throw new HttpException(409, `Error create key token`);
 
-  return await createTokenPair(payloadAccess, payloadRefresh, publicKeyString, privateKey);
+  return await createTokenPair(
+    payloadAccess,
+    payloadRefresh,
+    publicKeyString,
+    privateKey,
+  );
 };
 
 export default generateTokens;

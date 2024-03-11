@@ -19,7 +19,6 @@ export class CartController {
   public updateQuantity = async (req, res: Response) => {
     const { userId, shop_order_ids } = req.body;
 
-    const tong = CartService.tinhtong();
     const result = await CartService.updateProductQuantity({
       userId,
       shop_order_ids,

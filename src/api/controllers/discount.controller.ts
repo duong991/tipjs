@@ -18,7 +18,7 @@ export class DiscountController {
    * @description Update discount code
    * */
   public getAllProductsWithDiscountCode = async (req, res: Response) => {
-    const { code, shopId } = req.body;
+    const { code, shopId } = req.query;
     const { limit, page } = req.query;
     new OK({
       message: 'Get all products with discount code successfully',

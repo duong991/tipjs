@@ -76,20 +76,23 @@ export class CartService {
                   old_quantity,
                   productId
                 }
-            ]
+            ],
+            version :
         }
       ]
    * */
+
   static async updateProductQuantity({ userId, shop_order_ids }) {
-    const { quantity, shopId, old_quantity, productId } =
-      shop_order_ids[0]?.item_products;
+    const { productId, quantity, old_quantity } =
+      shop_order_ids[0]?.item_products[0];
 
     /* TODO: Check product exist */
     const foundProduct = await findProductById({ product_id: productId });
 
     if (!foundProduct) throw new HttpException(404, 'Product not found');
-    if (foundProduct._id !== productId)
+    if (foundProduct.product_shop.toString() !== shop_order_ids[0].shopId) {
       throw new HttpException(401, 'Invalid product');
+    }
 
     if (quantity === 0) {
       /* TODO: Delete product from cart */
@@ -102,10 +105,37 @@ export class CartService {
         productId,
         quantity: quantity - old_quantity,
         price: foundProduct.product_price,
-        shopId,
+        shopId: shop_order_ids[0].shopId,
       },
     });
   }
+
+  // static async updateProductQuantity({ userId, shop_order_ids }) {
+  //   const { quantity, shopId, old_quantity, productId } =
+  //     shop_order_ids[0]?.item_products;
+
+  //   /* TODO: Check product exist */
+  //   const foundProduct = await findProductById({ product_id: productId });
+
+  //   if (!foundProduct) throw new HttpException(404, 'Product not found');
+  //   if (foundProduct._id !== productId)
+  //     throw new HttpException(401, 'Invalid product');
+
+  //   if (quantity === 0) {
+  //     /* TODO: Delete product from cart */
+  //     deleteUserCard({ userId, productId });
+  //   }
+
+  //   return await updateProductQuantity({
+  //     userId,
+  //     product: {
+  //       productId,
+  //       quantity: quantity - old_quantity,
+  //       price: foundProduct.product_price,
+  //       shopId,
+  //     },
+  //   });
+  // }
 
   static async deleteUserCard({ userId, productId }) {
     return await deleteUserCard({ userId, productId });

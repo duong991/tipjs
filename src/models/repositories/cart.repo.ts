@@ -1,5 +1,6 @@
 import { convertToObjetId, unGetSelectData } from '@/utils';
 import { CartModel } from '../cart.model';
+import { HttpException } from '@/helpers/exceptions/HttpException';
 
 const createUserCard = async ({ userId, product }) => {
   const query = {
@@ -52,7 +53,9 @@ const updateProductQuantity = async ({ userId, product }) => {
       new: true,
     };
 
-  return await CartModel.findOneAndUpdate(query, update, options);
+  const result = await CartModel.findOneAndUpdate(query, update, options);
+  if (!result) throw new HttpException(404, 'Product not found');
+  return result;
 };
 
 const deleteUserCard = async ({ userId, productId }) => {
